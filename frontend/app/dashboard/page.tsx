@@ -68,6 +68,24 @@ export default function DashboardPage() {
     );
   }
 
+  if (!data) {
+    return (
+      <div className="card-industrial bg-white p-8 text-center space-y-4 my-6">
+        <AlertTriangle className="w-12 h-12 text-warning mx-auto animate-pulse" />
+        <div>
+          <h3 className="text-sm font-bold text-gray-900 uppercase">Gateway Connection Disrupted</h3>
+          <p className="text-xs text-gray-500 mt-1">Unable to load dashboard telemetry feeds from the backend diagnostic gateway.</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="bg-primary hover:bg-primary-dark text-black px-4 py-2 rounded text-xs font-bold uppercase transition-all shadow-sm cursor-pointer"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
+
   const { summary, charts, recent_diagnostics, recent_reports, timeline } = data;
 
   const COLORS = ['#10B981', '#F59E0B', '#EF4444']; // Green, Yellow, Red

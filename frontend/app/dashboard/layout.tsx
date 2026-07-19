@@ -161,24 +161,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* User Session & Dynamic Role Switcher (RBAC Tester) */}
           <div className="flex items-center space-x-4">
             {user && (
-              <div className="flex items-center bg-gray-100 border border-gray-300 rounded-md p-1 pr-3 shadow-sm">
-                <div className="flex items-center px-3 py-1 bg-industrial-dark text-white rounded text-xs font-mono font-bold mr-2">
+              <div className={`flex items-center bg-gray-100 border border-gray-300 rounded-md p-1 shadow-sm ${user.role === 'Administrator' ? 'pr-3' : 'pr-1'}`}>
+                <div className="flex items-center px-3 py-1 bg-industrial-dark text-white rounded text-xs font-mono font-bold">
                   <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-primary" />
                   ROLE: {activeRole}
                 </div>
                 
-                {/* Role Switcher Dropdown */}
-                <select
-                  value={activeRole || ''}
-                  onChange={(e) => switchRole(e.target.value)}
-                  className="text-xs font-semibold bg-white border border-gray-300 rounded px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                  title="Dynamic RBAC Switcher (Prototype utility)"
-                >
-                  <option value="Administrator">Administrator</option>
-                  <option value="Maintenance Engineer">Maintenance Engineer</option>
-                  <option value="Operator">Operator</option>
-                  <option value="Supervisor">Supervisor</option>
-                </select>
+                {/* Role Switcher Dropdown only accessible to Administrator */}
+                {user.role === 'Administrator' && (
+                  <select
+                    value={activeRole || ''}
+                    onChange={(e) => switchRole(e.target.value)}
+                    className="text-xs font-semibold bg-white border border-gray-300 rounded px-2 py-1 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary ml-2 cursor-pointer"
+                    title="Dynamic RBAC Switcher (Prototype utility)"
+                  >
+                    <option value="Administrator">Administrator</option>
+                    <option value="Maintenance Engineer">Maintenance Engineer</option>
+                    <option value="Operator">Operator</option>
+                    <option value="Supervisor">Supervisor</option>
+                  </select>
+                )}
               </div>
             )}
           </div>
