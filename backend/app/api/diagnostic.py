@@ -77,6 +77,49 @@ def run_diagnostic(
     )
     db.add(result)
 
+    # 6b. Check for risk threshold alarm (Health Score <= 20% indicates >= 80% Risk)
+    if result.health_score <= 20:
+        issue_count = len(diag_data.get("issues", []))
+        message = f"CRITICAL FAULT DETECTED: {machine.name} Health Score is {result.health_score}% with {issue_count} mismatch code failures."
+        
+        from backend.app.models.models import Alert
+        existing_alert = db.query(Alert).filter(
+            Alert.machine_id == req.machine_id,
+            Alert.is_resolved == False
+        ).first()
+        
+        if not existing_alert:
+            new_alert = Alert(
+                machine_id=req.machine_id,
+                health_score=result.health_score,
+                message=message,
+                is_resolved=False
+            )
+            db.add(new_alert)
+            
+            # Fetch all supervisor emails
+            supervisors = db.query(User).filter(User.role == "Supervisor").all()
+            recipient_emails = []
+            for sup in supervisors:
+                if sup.email and sup.email.strip():
+                    recipient_emails.append(sup.email.strip())
+            
+            if not recipient_emails:
+                recipient_emails = ["workwiththarun@gmail.com"]
+                
+            machine_info = {
+                "machine_id": machine.machine_id,
+                "name": machine.name,
+                "model": machine.model
+            }
+            
+            from backend.app.utils.email_service import send_risk_alert_email
+            send_risk_alert_email(
+                recipient_emails=recipient_emails,
+                machine_info=machine_info,
+                diagnostic_result=diag_data
+            )
+
     # 7. Write to system logs
     log = ActivityLog(
         employee_id=current_user.employee_id,

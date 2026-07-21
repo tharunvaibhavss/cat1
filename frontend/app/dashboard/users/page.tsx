@@ -41,6 +41,7 @@ export default function UsersPage() {
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('Operator');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   // Fetch users
   const { data: users = [], isLoading } = useQuery({
@@ -92,11 +93,12 @@ export default function UsersPage() {
     setUsername('');
     setRole('Operator');
     setPassword('');
+    setEmail('');
   };
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate({ employee_id: employeeId, username, role, password });
+    createMutation.mutate({ employee_id: employeeId, username, role, password, email });
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {
@@ -104,7 +106,7 @@ export default function UsersPage() {
     if (!selectedUser) return;
     updateMutation.mutate({
       id: selectedUser.id,
-      data: { username, role, password: password || undefined }
+      data: { username, role, password: password || undefined, email }
     });
   };
 
@@ -114,6 +116,7 @@ export default function UsersPage() {
     setUsername(user.username);
     setRole(user.role);
     setPassword(''); // don't load hashed password
+    setEmail(user.email || '');
     setIsEditOpen(true);
   };
 
@@ -171,6 +174,7 @@ export default function UsersPage() {
               <tr className="table-header text-[10px] uppercase font-bold tracking-wider">
                 <th className="p-4">Employee ID</th>
                 <th className="p-4">Employee Name</th>
+                <th className="p-4">Email Address</th>
                 <th className="p-4">Role Designation</th>
                 <th className="p-4 text-right">Actions</th>
               </tr>
@@ -178,13 +182,14 @@ export default function UsersPage() {
             <tbody className="divide-y divide-gray-150 text-xs">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-gray-400">Loading user database...</td>
+                  <td colSpan={5} className="p-8 text-center text-gray-400">Loading user database...</td>
                 </tr>
               ) : filteredUsers.length > 0 ? (
                 filteredUsers.map((u: any) => (
                   <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 font-mono font-bold text-gray-900">{u.employee_id}</td>
                     <td className="p-4 font-bold text-gray-950">{u.username}</td>
+                    <td className="p-4 font-mono text-gray-600">{u.email || 'N/A'}</td>
                     <td className="p-4 font-semibold text-gray-700">
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 border border-gray-200 uppercase font-mono">
                         {u.role}
@@ -220,7 +225,7 @@ export default function UsersPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-gray-400">No users match the search parameters.</td>
+                  <td colSpan={5} className="p-8 text-center text-gray-400">No users match the search parameters.</td>
                 </tr>
               )}
             </tbody>
@@ -277,6 +282,17 @@ export default function UsersPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-1.5 border border-gray-300 rounded text-xs bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="e.g. user@cat-diagnostics.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-1.5 border border-gray-300 rounded text-xs bg-gray-50 text-gray-800"
                 />
               </div>
 

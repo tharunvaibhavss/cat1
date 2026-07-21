@@ -101,3 +101,24 @@ def test_diagnostic_engine_critical_thermal():
     assert results["health_score"] == 65  # 100 - 35
     assert len(results["issues"]) == 1
     assert "CRITICAL" in results["issues"][0]["message"]
+
+def test_email_alert_logging_fallback():
+    import os
+    from backend.app.utils.email_service import send_risk_alert_email
+    machine_info = {
+        "machine_id": "TEST-UNIT-01",
+        "name": "Test Hydraulic System",
+        "model": "CAT-T1"
+    }
+    diagnostic_result = {
+        "health_score": 15,
+        "status": "Fault",
+        "details": {
+            "issues": [
+                {"parameter": "Thermal", "severity": "Critical", "message": "Temperature exceeded 95C."},
+                {"parameter": "Firmware", "severity": "Critical", "message": "Firmware version mismatch."}
+            ]
+        }
+    }
+    send_risk_alert_email(["workwiththarun@gmail.com"], machine_info, diagnostic_result)
+    assert os.path.exists("backend/static/reports/last_alert_email.html") is True

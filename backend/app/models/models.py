@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
 from backend.app.database.connection import Base
 
@@ -11,6 +11,7 @@ class User(Base):
     username = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False)  # Administrator, Maintenance Engineer, Operator, Supervisor
+    email = Column(String, nullable=True)
 
     reports = relationship("Report", back_populates="engineer")
 
@@ -102,3 +103,16 @@ class ActivityLog(Base):
     employee_id = Column(String, nullable=False)
     action = Column(String, nullable=False)  # Login, Logout, Machine Connected, Diagnostic Started, etc.
     details = Column(String, nullable=True)
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    machine_id = Column(String, ForeignKey("machines.machine_id", ondelete="CASCADE"), nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    health_score = Column(Integer, nullable=False)
+    message = Column(String, nullable=False)
+    is_resolved = Column(Boolean, default=False, nullable=False)
+    resolved_at = Column(DateTime, nullable=True)
+
+    machine = relationship("Machine")

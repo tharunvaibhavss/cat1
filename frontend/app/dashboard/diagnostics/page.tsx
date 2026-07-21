@@ -491,7 +491,7 @@ ${aiAnalysis.troubleshooting_steps}
                   {/* Specific issues list */}
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Detected Mismatches ({activeResult.details?.issues?.length || 0})</h4>
-                    <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                    <div className="space-y-2max-h-[160px] overflow-y-auto pr-1">
                       {activeResult.details?.issues?.length > 0 ? (
                         activeResult.details.issues.map((issue: any, index: number) => (
                           <div key={index} className="p-3 bg-red-50/50 border border-red-100 rounded text-xs">
@@ -501,7 +501,7 @@ ${aiAnalysis.troubleshooting_steps}
                         ))
                       ) : (
                         <div className="p-3 bg-green-50 border border-green-150 rounded text-xs flex items-center text-green-800">
-                          <CheckCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 mr-2flex-shrink-0" />
                           <span>ALL HARDWARE & FIRMWARE BLOCKS SECURELY MATCH BLUEPRINTS.</span>
                         </div>
                       )}
@@ -590,7 +590,7 @@ ${aiAnalysis.troubleshooting_steps}
                   </div>
                 </div>
 
-                <div className="space-y-4 text-xs h-[300px] overflow-y-auto pr-1">
+                <div className="space-y-4 text-xsh-[300px] overflow-y-auto pr-1">
                   <div>
                     <h4 className="font-bold text-gray-900 border-b border-gray-100 pb-1 mb-1">Safety & Health Assessment</h4>
                     <p className="text-gray-600 leading-relaxed">{aiAnalysis.machine_health}</p>
@@ -607,7 +607,7 @@ ${aiAnalysis.troubleshooting_steps}
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-gray-900 border-b border-gray-100 pb-1 mb-1 font-bold text-primary-dark">Step-by-Step Maintenance Recommendations</h4>
+                    <h4 className="font-boldtext-gray-900 border-b border-gray-100 pb-1 mb-1font-bold text-primary-dark">Step-by-Step Maintenance Recommendations</h4>
                     <p className="text-gray-600 leading-relaxed whitespace-pre-line">{aiAnalysis.maintenance_recommendation}</p>
                   </div>
 

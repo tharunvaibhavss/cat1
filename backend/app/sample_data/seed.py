@@ -27,10 +27,10 @@ def seed_database():
 
         # 1. Seed Users
         users = [
-            User(employee_id="EMP-ADMIN01", username="John Administrator", role="Administrator", password_hash=get_password_hash("admin123")),
-            User(employee_id="EMP-ENG01", username="Sarah Engineer", role="Maintenance Engineer", password_hash=get_password_hash("eng123")),
-            User(employee_id="EMP-OP01", username="Dave Operator", role="Operator", password_hash=get_password_hash("op123")),
-            User(employee_id="EMP-SUP01", username="Helen Supervisor", role="Supervisor", password_hash=get_password_hash("sup123")),
+            User(employee_id="EMP-ADMIN01", username="John Administrator", role="Administrator", password_hash=get_password_hash("admin123"), email="admin@cat-diagnostics.com"),
+            User(employee_id="EMP-ENG01", username="Sarah Engineer", role="Maintenance Engineer", password_hash=get_password_hash("eng123"), email="engineer@cat-diagnostics.com"),
+            User(employee_id="EMP-OP01", username="Dave Operator", role="Operator", password_hash=get_password_hash("op123"), email="operator@cat-diagnostics.com"),
+            User(employee_id="EMP-SUP01", username="Helen Supervisor", role="Supervisor", password_hash=get_password_hash("sup123"), email="workwiththarun@gmail.com"),
         ]
         db.add_all(users)
         db.commit()

@@ -8,6 +8,7 @@ interface User {
   employee_id: string;
   username: string;
   role: string;
+  email?: string | null;
 }
 
 interface AuthContextType {
@@ -17,6 +18,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   switchRole: (role: string) => void;
   isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,7 +38,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Read user from localStorage on mount
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (savedUser && token) {
@@ -51,11 +52,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const data = await authService.login(employeeId, password, rememberMe);
+      // Fetch profile to load email
+      const profile = await authService.getProfile();
       const loggedUser = {
-        employee_id: data.employee_id,
-        username: data.username,
-        role: data.role,
+        employee_id: profile.employee_id,
+        username: profile.username,
+        role: profile.role,
+        email: profile.email
       };
+      localStorage.setItem('user', JSON.stringify(loggedUser));
       setUser(loggedUser);
       setActiveRole(loggedUser.role);
       return data;
@@ -84,7 +89,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, activeRole, login, logout, switchRole, isLoading }}>
+      <AuthContext.Provider value={{ user, activeRole, login, logout, switchRole, isLoading, setUser }}>
         {children}
       </AuthContext.Provider>
     </QueryClientProvider>

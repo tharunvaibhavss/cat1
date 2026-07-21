@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { dashboardService } from '@/services/api';
 import { useAuth } from '@/components/Providers';
 import { 
@@ -36,6 +36,7 @@ import {
 export default function DashboardPage() {
   const { activeRole } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const queryClient = useQueryClient();
 
   // Avoid hydration mismatch for Recharts
   useEffect(() => {
@@ -102,7 +103,10 @@ export default function DashboardPage() {
           </p>
         </div>
         <button
-          onClick={() => refetch()}
+          onClick={async () => {
+            await queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
+            refetch();
+          }}
           disabled={isFetching}
           className="flex items-center space-x-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 rounded px-4 py-2 text-xs font-bold shadow-sm transition-all disabled:opacity-50"
         >

@@ -15,13 +15,19 @@ import {
   Menu, 
   X,
   User as UserIcon,
-  ShieldCheck
+  ShieldCheck,
+  Bell,
+  Settings
 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, activeRole, switchRole, logout } = useAuth();
+  const { user, activeRole, switchRole, logout, setUser } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [myEmail, setMyEmail] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [emailMsg, setEmailMsg] = useState('');
 
   // Define navigation items based on active role permissions
   const navItems = [
@@ -29,6 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Machine Fleet', href: '/dashboard/machines', icon: Cpu, roles: ['Administrator', 'Maintenance Engineer', 'Operator', 'Supervisor'] },
     { name: 'Diagnostic Bench', href: '/dashboard/diagnostics', icon: Wrench, roles: ['Administrator', 'Maintenance Engineer', 'Operator'] },
     { name: 'PDF Reports', href: '/dashboard/reports', icon: FileText, roles: ['Administrator', 'Maintenance Engineer', 'Supervisor'] },
+    { name: 'Alert Log', href: '/dashboard/alerts', icon: Bell, roles: ['Administrator', 'Maintenance Engineer', 'Operator', 'Supervisor'] },
     { name: 'User Management', href: '/dashboard/users', icon: Users, roles: ['Administrator'] }
   ];
 
@@ -73,22 +80,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Sidebar Footer Account */}
         <div className="p-4 border-t border-gray-800 bg-[#151515]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gray-800 rounded-full text-primary">
+            <div className="flex items-center space-x-3 overflow-hidden">
+              <div className="p-2 bg-gray-800 rounded-full text-primary flex-shrink-0">
                 <UserIcon className="w-4 h-4" />
               </div>
-              <div className="overflow-hidden">
+              <div className="overflow-hidden w-24">
                 <p className="text-xs font-bold text-white truncate">{user?.username}</p>
                 <p className="text-[10px] text-gray-500 font-mono tracking-tighter uppercase">{user?.employee_id}</p>
               </div>
             </div>
-            <button 
-              onClick={logout} 
-              className="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-800 transition-colors"
-              title="Logout from terminal"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            <div className="flex items-center space-x-1">
+              <button 
+                onClick={() => {
+                  setMyEmail(user?.email || '');
+                  setEmailMsg('');
+                  setProfileOpen(true);
+                }} 
+                className="p-1.5 text-gray-400 hover:text-primary rounded hover:bg-gray-800 transition-colors"
+                title="Edit Profile Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={logout} 
+                className="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-800 transition-colors"
+                title="Logout from terminal"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
@@ -126,16 +146,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </nav>
             <div className="p-4 border-t border-gray-800 bg-[#151515] flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <UserIcon className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="text-xs font-bold text-white">{user?.username}</p>
+              <div className="flex items-center space-x-3 text-left overflow-hidden">
+                <UserIcon className="w-5 h-5 text-primary flex-shrink-0" />
+                <div className="overflow-hidden w-28">
+                  <p className="text-xs font-bold text-white truncate">{user?.username}</p>
                   <p className="text-[10px] text-gray-500 font-mono">{user?.employee_id}</p>
                 </div>
               </div>
-              <button onClick={logout} className="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-800">
-                <LogOut className="w-4 h-4" />
-              </button>
+              <div className="flex items-center space-x-1">
+                <button 
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setMyEmail(user?.email || '');
+                    setEmailMsg('');
+                    setProfileOpen(true);
+                  }}
+                  className="p-1.5 text-gray-400 hover:text-primary rounded hover:bg-gray-800"
+                  title="Profile Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+                <button onClick={logout} className="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-800">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </aside>
         </div>
@@ -193,6 +227,83 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </main>
       </div>
+
+      {/* ----------------- PROFILE SETTINGS MODAL ----------------- */}
+      {profileOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-gray-200">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-black text-white border-b border-gray-800 flex justify-between items-center">
+              <h3 className="font-extrabold text-sm tracking-widest text-primary uppercase">Profile Configurations</h3>
+              <button onClick={() => setProfileOpen(false)} className="text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Employee Account</label>
+                <div className="p-3 bg-gray-50 rounded border border-gray-200">
+                  <p className="text-sm font-bold text-gray-800">{user?.username}</p>
+                  <p className="text-xs text-gray-500 font-mono mt-0.5">{user?.employee_id} &bull; {activeRole}</p>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="profile-email-input" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Supervisor / Contact Email</label>
+                <input
+                  id="profile-email-input"
+                  type="email"
+                  placeholder="e.g. supervisor@gmail.com"
+                  value={myEmail}
+                  onChange={(e) => setMyEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary text-sm text-gray-800"
+                />
+                <p className="text-[11px] text-gray-400 mt-1">This email address will be notified when critical machine faults are detected.</p>
+              </div>
+              {emailMsg && (
+                <div className={`p-3 rounded text-xs font-semibold ${emailMsg.startsWith('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+                  {emailMsg}
+                </div>
+              )}
+            </div>
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end space-x-2">
+              <button
+                onClick={() => setProfileOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded text-xs font-bold text-gray-600 hover:bg-gray-100 uppercase"
+              >
+                Close
+              </button>
+              <button
+                onClick={async () => {
+                  setSavingEmail(true);
+                  setEmailMsg('');
+                  try {
+                    const { userService } = await import('@/services/api');
+                    const updated = await userService.updateMyEmail(myEmail);
+                    setUser(prev => prev ? { ...prev, email: updated.email } : null);
+                    const savedUser = localStorage.getItem('user');
+                    if (savedUser) {
+                      const parsed = JSON.parse(savedUser);
+                      parsed.email = updated.email;
+                      localStorage.setItem('user', JSON.stringify(parsed));
+                    }
+                    setEmailMsg('Email updated successfully!');
+                  } catch (e: any) {
+                    setEmailMsg('Error: ' + (e.response?.data?.detail || e.message || 'Failed to update email.'));
+                  } finally {
+                    setSavingEmail(false);
+                  }
+                }}
+                disabled={savingEmail}
+                className="px-4 py-2 bg-primary hover:bg-yellow-500 text-black rounded text-xs font-bold uppercase transition-colors"
+              >
+                {savingEmail ? 'Saving...' : 'Save Settings'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

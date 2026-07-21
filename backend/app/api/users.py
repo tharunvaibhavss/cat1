@@ -19,6 +19,13 @@ def list_users(
 ):
     return db.query(User).all()
 
+@router.get("/supervisors", response_model=List[UserOut])
+def list_supervisors_public(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return db.query(User).filter(User.role == "Supervisor").all()
+
 @router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def create_user(
     user_in: UserCreate,
@@ -38,7 +45,8 @@ def create_user(
         employee_id=user_in.employee_id,
         username=user_in.username,
         role=user_in.role,
-        password_hash=hashed_pwd
+        password_hash=hashed_pwd,
+        email=user_in.email
     )
     db.add(new_user)
     
@@ -68,6 +76,8 @@ def update_user(
         user.username = user_in.username
     if user_in.role is not None:
         user.role = user_in.role
+    if user_in.email is not None:
+        user.email = user_in.email
     if user_in.password is not None and user_in.password.strip() != "":
         user.password_hash = get_password_hash(user_in.password)
         
@@ -106,3 +116,17 @@ def delete_user(
     db.add(log)
     db.commit()
     return {"message": "User deleted successfully"}
+
+@router.put("/me/email", response_model=UserOut)
+def update_my_email(
+    user_in: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if user_in.email is None:
+        raise HTTPException(status_code=400, detail="Email is required.")
+        
+    current_user.email = user_in.email
+    db.commit()
+    db.refresh(current_user)
+    return current_user

@@ -24,6 +24,7 @@ class UserBase(BaseModel):
     employee_id: str
     username: str
     role: str
+    email: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
@@ -32,6 +33,7 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
     role: Optional[str] = None
+    email: Optional[str] = None
 
 class UserOut(UserBase):
     id: int
@@ -158,6 +160,19 @@ class ActivityLogOut(BaseModel):
     employee_id: str
     action: str
     details: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+# Alert Schemas
+class AlertOut(BaseModel):
+    id: int
+    machine_id: str
+    timestamp: datetime
+    health_score: int
+    message: str
+    is_resolved: bool
+    resolved_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

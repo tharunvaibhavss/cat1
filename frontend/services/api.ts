@@ -86,6 +86,34 @@ export const userService = {
   delete: async (id: number) => {
     const response = await api.delete(`/users/${id}`);
     return response.data;
+  },
+  updateMyEmail: async (email: string) => {
+    const response = await api.put('/users/me/email', { email });
+    return response.data;
+  },
+  listSupervisors: async () => {
+    const response = await api.get('/users/supervisors');
+    return response.data;
+  }
+};
+
+// Alerts endpoints
+export const alertService = {
+  list: async () => {
+    const response = await api.get('/alerts');
+    return response.data;
+  },
+  resolve: async (id: number) => {
+    const response = await api.post(`/alerts/${id}/resolve`);
+    return response.data;
+  },
+  sendEmail: async (id: number, email?: string) => {
+    const response = await api.post(`/alerts/${id}/email`, null, { params: { email } });
+    return response.data;
+  },
+  delete: async (id: number) => {
+    const response = await api.delete(`/alerts/${id}`);
+    return response.data;
   }
 };
 

@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from backend.app.database.connection import engine, Base
-from backend.app.api import auth, users, machines, diagnostic, llm, reports, dashboard
+from backend.app.api import auth, users, machines, diagnostic, llm, reports, dashboard, alerts
 from backend.app.sample_data.seed import seed_database
 from backend.app.database.connection import SessionLocal
 from backend.app.models.models import User
@@ -60,6 +60,7 @@ app.include_router(diagnostic.router, prefix="/api")
 app.include_router(llm.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
+app.include_router(alerts.router, prefix="/api")
 
 @app.get("/")
 def read_root():
